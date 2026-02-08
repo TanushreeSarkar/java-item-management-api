@@ -1,74 +1,165 @@
-# Simple E-commerce Backend
+# E-Commerce Product Management REST API
 
-A simple Spring Boot application for managing e-commerce products.
+![Java](https://img.shields.io/badge/Java-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)
+![Spring Boot](https://img.shields.io/badge/Spring_Boot-6DB33F?style=for-the-badge&logo=spring&logoColor=white)
+![Maven](https://img.shields.io/badge/Maven-C71A36?style=for-the-badge&logo=apache-maven&logoColor=white)
+![RESTful](https://img.shields.io/badge/RESTful-API-009688?style=for-the-badge)
+
+Clean, lightweight **Spring Boot REST API** for managing e-commerce products — created as a sample task for freelance Java developer evaluation.
+
+### Highlights
+- Layered architecture (Controller → Service → In-memory Repository)
+- Input validation with Jakarta Bean Validation
+- Proper HTTP status codes & consistent JSON error responses
+- In-memory storage (ArrayList) — no database setup needed
+- Maven Wrapper included (runs without global Maven install)
+- Professional, recruiter-friendly documentation
+
+## Table of Contents
+
+- [Features](#features)
+- [Technologies](#technologies)
+- [Prerequisites](#prerequisites)
+- [Quick Start](#quick-start)
+- [API Endpoints](#api-endpoints)
+- [Request & Response Examples](#request--response-examples)
+- [Validation Rules](#validation-rules)
+- [Error Handling](#error-handling)
+- [Project Structure](#project-structure)
+- [Deployment (Quick & Free Demo)](#deployment-quick--free-demo)
+- [Submitted by](#submitted-by)
+
+## Features
+
+- Create product (`POST /api/products`)
+- Get single product by ID (`GET /api/products/{id}`)
+- List all products (`GET /api/products`) — bonus endpoint
+- Automatic validation on name & price
+- Clear, structured error messages
+- No external dependencies beyond Spring Boot
+
+## Technologies
+
+- Java 17+
+- Spring Boot 3.x
+- Spring Web
+- Jakarta Bean Validation
+- Lombok (optional – reduces boilerplate)
+- Maven (with wrapper)
 
 ## Prerequisites
-- Java 17 or higher
-- Maven (optional, wrapper included in standard projects, but here we assume `mvn` is installed or use global maven)
 
-## Running the Application
-To run the application, navigate to the project root and execute:
+- Java 17 or higher
+- Git (optional)
+- curl / Postman / Insomnia (for testing)
+
+## Quick Start
 
 ```bash
-mvn spring-boot:run
-```
+# 1. Navigate to project folder
+cd your-project-folder
 
-The application will start on `http://localhost:8080`.
+# 2. Run with included Maven Wrapper
+./mvnw clean spring-boot:run
+
+# Windows users:
+# mvnw.cmd clean spring-boot:run
+```
+Application starts at: **http://localhost:8080**  
+API base path: **/api/products**
 
 ## API Endpoints
 
-### 1. Add a Product
-**Endpoint:** `POST /api/products`
-**Body:**
-```json
-{
-  "name": "Laptop",
-  "description": "High-end gaming laptop",
-  "price": 1200.50
-}
-```
+| Method | Endpoint              | Description                  | Success | Common Errors |
+|--------|-----------------------|------------------------------|---------|---------------|
+| POST   | `/api/products`       | Create a new product         | 201     | 400           |
+| GET    | `/api/products/{id}`  | Get product by ID            | 200     | 404           |
+| GET    | `/api/products`       | Get all products             | 200     | —             |
 
-### 2. Get a Product by ID
-**Endpoint:** `GET /api/products/{id}`
+## Request & Response Examples
 
-### 3. Get All Products
-**Endpoint:** `GET /api/products`
-
-## Validation
-- `name`: Cannot be blank.
-- `price`: Must be greater than 0.
-
-## Example Usage with Curl
+### Create a Product
 
 ```bash
-# Add a product
-curl -X POST http://localhost:8080/api/products -H "Content-Type: application/json" -d '{"name": "Phone", "description": "Smart phone", "price": 699.99}'
-
-## Deployment (Simple & Fast)
-To deploy this application "correctly" and simply without Docker:
-
-1.  **Build the JAR file**:
-    ```bash
-    ./mvnw clean package
-    ```
-2.  **Run the JAR**:
-    Copy the generated jar file (`target/ecommerce-0.0.1-SNAPSHOT.jar`) to your server and run:
-    ```bash
-    java -jar ecommerce-0.0.1-SNAPSHOT.jar
-    ```
-
-You need a server/environment with **Java 17+ installed** (e.g., a VPS, standard cloud VM, or a Java-native host).
-
-## Error Handling
-The API returns standard JSON error responses:
-- **404 Not Found**: When a resource (e.g., Product ID) is not found.
-- **400 Bad Request**: When input validation fails (e.g., missing name, invalid price).
-- **500 Internal Server Error**: For unexpected server errors.
-
-Example Error Response:
-```json
-{
-  "price": "must be greater than 0",
-  "name": "must not be blank"
+curl -i -X POST http://localhost:8080/api/products \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Wireless Earbuds",
+    "description": "True wireless earbuds with ANC & 28h battery",
+    "price": 89.99
+  }'
+```
+201 Created
+```bash
+JSON{
+  "id": 1,
+  "name": "Wireless Earbuds",
+  "description": "True wireless earbuds with ANC & 28h battery",
+  "price": 89.99
 }
 ```
+Get Product by ID
+```bash
+curl http://localhost:8080/api/products/1
+```
+200 OK example response
+```bash
+JSON{
+  "id": 1,
+  "name": "Wireless Earbuds",
+  "description": "True wireless earbuds with ANC & 28h battery",
+  "price": 89.99
+}
+```
+Get All Products
+```bash
+curl http://localhost:8080/api/products
+```
+Validation Rules
+FieldConstraintError Message on FailurenameNot blank, min 2 chars"Product name is required"pricePositive (> 0)"Price must be greater than zero"descriptionOptional—
+Error Handling
+
+Validation error example (400 Bad Request)
+```bash
+JSON{
+  "timestamp": "2026-02-08T22:45:12Z",
+  "status": 400,
+  "error": "Validation failed",
+  "details": {
+    "name": "Product name is required",
+    "price": "Price must be greater than zero"
+  }
+}
+```
+Not found example (404)
+```bash
+JSON{
+  "timestamp": "2026-02-08T22:45:12Z",
+  "status": 404,
+  "error": "Not Found",
+  "message": "Product not found with id: 999"
+}
+```
+Project Structure
+```bash
+├── src/
+│   ├── main/
+│   │   ├── java/com/example/ecommerce/
+│   │   │   ├── controller/
+│   │   │   ├── model/
+│   │   │   ├── service/
+│   │   │   ├── repository/
+│   │   │   └── EcommerceApplication.java
+│   │   └── resources/
+│   │       └── application.properties
+│   └── test/
+├── .mvn/
+├── mvnw
+├── mvnw.cmd
+├── pom.xml
+└── README.md
+```
+Submitted by
+Tanushree Sarkar
+Freelance Java Developer Sample Task
+February 2026
